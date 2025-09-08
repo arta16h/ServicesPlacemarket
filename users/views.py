@@ -7,3 +7,7 @@ from .serializers import UserSerializer, ProviderProfileSerializer
 class RegisterUserView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+class RegisterProviderView(generics.CreateAPIView):
+    queryset = ProviderProfile.objects.all()
+    serializer_class = ProviderProfileSerializer
