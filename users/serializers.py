@@ -1,17 +1,14 @@
 from rest_framework import serializers
 from .models import User, ProviderProfile
-
-
+from services.serializers import ProviderServiceSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
-
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'phone_number', 'password', 'is_customer', 'is_provider', 'default_address']
-
 
     def create(self, validated_data):
         password = validated_data.pop('password')
@@ -21,16 +18,12 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
-
-
 class ProviderProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
-
 
     class Meta:
         model = ProviderProfile
         fields = ['id', 'user', 'main_category', 'service_area', 'document', 'verified']
-
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
@@ -42,3 +35,11 @@ class ProviderProfileSerializer(serializers.ModelSerializer):
             user.save()
         provider = ProviderProfile.objects.create(user=user, **validated_data)
         return provider
+    
+
+class ProviderProfileDetailSerializer(serializers.ModelSerializer):
+    services = ProviderServiceSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ProviderProfile
+        fields = ["id", "main_category", "service_area", "document", "services"]
