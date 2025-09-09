@@ -28,3 +28,17 @@ class DepositWalletView(APIView):
         Transaction.objects.create(wallet=wallet, type="deposit", amount=amount)
         return Response({"message": "Wallet charged", "balance": wallet.balance})
 
+# برداشت از کیف پول (ویژه ارائه‌دهنده‌ها)
+class WithdrawWalletView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        amount = float(request.data.get("amount", 0))
+        wallet = request.user.wallet
+        if amount <= 0 or amount > wallet.balance:
+            return Response({"error": "Invalid amount"}, status=status.HTTP_400_BAD_REQUEST)
+        wallet.balance -= amount
+        wallet.save()
+        Transaction.objects.create(wallet=wallet, type="withdraw", amount=amount)
+        return Response({"message": "Withdrawal successful", "balance": wallet.balance})
+
