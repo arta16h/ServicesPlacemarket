@@ -1,14 +1,17 @@
 from rest_framework import serializers
-from .models import User, ProviderProfile
+from django.contrib.auth import get_user_model
+from .models import User, Provider, Address
 from services.serializers import ProviderServiceSerializer
 
 
-class UserSerializer(serializers.ModelSerializer):
+User = get_user_model()
+
+class UserRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'phone_number', 'password', 'is_customer', 'is_provider', 'default_address']
+        fields = ['id', 'username', 'email', 'password', 'phone_number', 'role']
 
     def create(self, validated_data):
         password = validated_data.pop('password')
@@ -19,10 +22,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ProviderProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
 
     class Meta:
-        model = ProviderProfile
+        model = Provider
         fields = ['id', 'user', 'main_category', 'service_area', 'document', 'verified']
 
     def create(self, validated_data):
@@ -33,7 +35,7 @@ class ProviderProfileSerializer(serializers.ModelSerializer):
         if password:
             user.set_password(password)
             user.save()
-        provider = ProviderProfile.objects.create(user=user, **validated_data)
+        provider = Provider.objects.create(user=user, **validated_data)
         return provider
     
 
@@ -41,5 +43,5 @@ class ProviderProfileDetailSerializer(serializers.ModelSerializer):
     services = ProviderServiceSerializer(many=True, read_only=True)
 
     class Meta:
-        model = ProviderProfile
+        model = Provider
         fields = ["id", "main_category", "service_area", "document", "services"]
