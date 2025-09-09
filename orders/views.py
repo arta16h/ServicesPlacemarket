@@ -3,8 +3,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import Order, ProviderAvailability
+from payments.models import Wallet, Transaction
 from .serializers import OrderSerializer, ProviderAvailabilitySerializer
 from services.models import ProviderService
+from utils.comission import get_commission_rate
 
 # مشتری سفارش ایجاد می‌کند
 class CreateOrderView(generics.CreateAPIView):
@@ -60,4 +62,15 @@ class ProviderAvailabilityView(generics.ListCreateAPIView):
         return ProviderAvailability.objects.filter(provider__user=self.request.user)
 
     def perform_create(self, serializer):
-        serializer.save(provider=self.request.user.providerprofile)
+        if self.request.user.role != "provider":
+            raise PermissionError("Only providers can add availability")
+        serializer.save(provider=self.request.user.provider)
+
+# لیست تایم‌های آزاد یک ارائه‌دهنده
+class ProviderAvailabilityListView(generics.ListAPIView):
+    serializer_class = ProviderAvailabilitySerializer
+
+    def get_queryset(self):
+        provider_id = self.kwargs["pk"]
+        return ProviderAvailability.objects.filter(provider_id=provider_id, is_booked=False, start_time__gte=datetime.now())
+
