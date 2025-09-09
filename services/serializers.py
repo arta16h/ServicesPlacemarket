@@ -14,9 +14,9 @@ class SubCategorySerializer(serializers.ModelSerializer):
 
 
 class ProviderServiceSerializer(serializers.ModelSerializer):
-    subcategory_name = serializers.CharField(source="subcategory.name", read_only=True)
-    category_name = serializers.CharField(source="subcategory.category.name", read_only=True)
-
+    provider_username = serializers.CharField(source='provider.user.username', read_only=True)
+    
     class Meta:
         model = ProviderService
-        fields = ["id", "subcategory", "subcategory_name", "category_name", "price", "base_fee"]
+        fields = ['id', 'provider', 'provider_username', 'subcategory', 'price', 'travel_fee', 'description']
+        read_only_fields = ['provider']
