@@ -27,3 +27,11 @@ class CreateReviewView(generics.CreateAPIView):
             order=order
         )
 
+# نمایش نظرات ارائه‌دهنده
+class ProviderReviewsView(generics.ListAPIView):
+    serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        provider_id = self.kwargs["pk"]
+        return Review.objects.filter(provider_id=provider_id)
+
