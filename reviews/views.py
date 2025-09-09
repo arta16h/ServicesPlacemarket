@@ -3,7 +3,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import Review
 from .serializers import ReviewSerializer
-from orders.models import Order, Provider
+from users.models import ProviderProfile
+from orders.models import Order
 from django.db.models import Avg, Count
 
 # ثبت نظر و امتیاز
@@ -40,7 +41,7 @@ class LeaderboardView(generics.ListAPIView):
     serializer_class = ReviewSerializer
 
     def list(self, request, *args, **kwargs):
-        providers = Provider.objects.annotate(
+        providers = ProviderProfile.objects.annotate(
             avg_rating=Avg("reviews__rating"),
             total_reviews=Count("reviews")
         ).order_by("-avg_rating", "-total_reviews")[:10]
