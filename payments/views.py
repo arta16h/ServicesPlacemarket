@@ -14,3 +14,17 @@ class WalletView(generics.RetrieveAPIView):
     def get_object(self):
         return self.request.user.wallet
 
+# شارژ کیف پول 
+class DepositWalletView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        amount = float(request.data.get("amount", 0))
+        if amount <= 0:
+            return Response({"error": "Invalid amount"}, status=status.HTTP_400_BAD_REQUEST)
+        wallet = request.user.wallet
+        wallet.balance += amount
+        wallet.save()
+        Transaction.objects.create(wallet=wallet, type="deposit", amount=amount)
+        return Response({"message": "Wallet charged", "balance": wallet.balance})
+
