@@ -35,3 +35,23 @@ class ProviderReviewsView(generics.ListAPIView):
         provider_id = self.kwargs["pk"]
         return Review.objects.filter(provider_id=provider_id)
 
+# لیدربرد بر اساس امتیاز
+class LeaderboardView(generics.ListAPIView):
+    serializer_class = ReviewSerializer
+
+    def list(self, request, *args, **kwargs):
+        providers = Provider.objects.annotate(
+            avg_rating=Avg("reviews__rating"),
+            total_reviews=Count("reviews")
+        ).order_by("-avg_rating", "-total_reviews")[:10]
+
+        data = [
+            {
+                "provider": p.user.username,
+                "service": p.service.name,
+                "avg_rating": p.avg_rating or 0,
+                "total_reviews": p.total_reviews
+            }
+            for p in providers
+        ]
+        return Response(data)
