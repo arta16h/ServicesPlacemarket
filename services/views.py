@@ -1,28 +1,29 @@
-from rest_framework import generics, filters
+from rest_framework import generics, filters, permissions, viewsets
 from .models import ServiceCategory, SubCategory, ProviderService
 from .serializers import ServiceCategorySerializer, SubCategorySerializer, ProviderServiceSerializer
-from rest_framework.permissions import IsAuthenticated
 
 
-class ServiceCategoryListView(generics.ListCreateAPIView):
+class ServiceCategoryViewSet(viewsets.ModelViewSet):
     queryset = ServiceCategory.objects.all()
     serializer_class = ServiceCategorySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
-class SubCategoryListView(generics.ListCreateAPIView):
+class SubCategoryViewSet(viewsets.ModelViewSet):
     queryset = SubCategory.objects.all()
     serializer_class = SubCategorySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
-class ProviderServiceListCreateView(generics.ListCreateAPIView):
+class ProviderServiceViewSet(viewsets.ModelViewSet):
+    queryset = ProviderService.objects.all()
     serializer_class = ProviderServiceSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return ProviderService.objects.filter(provider__user=self.request.user)
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
-        serializer.save(provider=self.request.user.providerprofile)
+        if not hasattr(self.request.user, 'provider'):
+            raise PermissionError("فقط ارائه دهندگان قادر به اضافه کردن سرویس هستند")
+        serializer.save(provider=self.request.user.provider)
 
 
 class SearchServiceView(generics.ListAPIView):
