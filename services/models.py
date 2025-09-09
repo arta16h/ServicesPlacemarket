@@ -1,5 +1,5 @@
 from django.db import models
-from users.models import ProviderProfile
+from users.models import Provider
 
 
 class ServiceCategory(models.Model):
@@ -18,10 +18,11 @@ class SubCategory(models.Model):
     
 
 class ProviderService(models.Model):
-# Links a ProviderProfile to a specific subservice and stores provider price
-    provider = models.ForeignKey(ProviderProfile, on_delete=models.CASCADE, related_name="services")
+# Links a Provider to a specific subservice and stores provider price
+    provider = models.ForeignKey(Provider, on_delete=models.CASCADE, related_name="services")
     subcategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE, related_name="provider_services")
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    travel_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     base_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="مثلاً ایاب و ذهاب")
 
 
