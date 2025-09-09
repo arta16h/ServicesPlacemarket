@@ -43,9 +43,8 @@ class ProviderRegisterSerializer(serializers.ModelSerializer):
         return provider
     
 
-class ProviderProfileDetailSerializer(serializers.ModelSerializer):
-    services = ProviderServiceSerializer(many=True, read_only=True)
-
+class AddressSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Provider
-        fields = ["id", "main_category", "service_area", "document", "services"]
+        model = Address
+        fields = ['id', 'label', 'full_address', 'place_id', 'latitude', 'longitude', 'created_at']
+        read_only_fields = ['created_at']
