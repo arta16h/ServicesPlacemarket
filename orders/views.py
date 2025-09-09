@@ -51,4 +51,13 @@ class UpdateOrderStatusView(APIView):
         order.save()
         return Response(OrderSerializer(order).data)
 
+# مدیریت تقویم کاری ارائه‌دهنده
+class ProviderAvailabilityView(generics.ListCreateAPIView):
+    serializer_class = ProviderAvailabilitySerializer
+    permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        return ProviderAvailability.objects.filter(provider__user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(provider=self.request.user.providerprofile)
