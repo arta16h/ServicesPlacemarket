@@ -24,4 +24,12 @@ class CustomerOrdersView(generics.ListAPIView):
     def get_queryset(self):
         return Order.objects.filter(customer=self.request.user)
 
+# لیست سفارش‌های ارائه‌دهنده
+class ProviderOrdersView(generics.ListAPIView):
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Order.objects.filter(provider__user=self.request.user)
+
 
