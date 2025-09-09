@@ -21,20 +21,24 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return user
 
 
-class ProviderProfileSerializer(serializers.ModelSerializer):
+class ProviderRegisterSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True)
+    email = serializers.EmailField(write_only=True, required=False)
+    phone_number = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = Provider
-        fields = ['id', 'user', 'main_category', 'service_area', 'document', 'verified']
+        fields = ['id', 'username', 'password', 'email', 'phone_number', 'main_category', 'region', 'documents']
 
     def create(self, validated_data):
-        user_data = validated_data.pop('user')
-        user_data['is_provider'] = True
-        password = user_data.pop('password', None)
-        user = User.objects.create(**user_data)
-        if password:
-            user.set_password(password)
-            user.save()
+        username = validated_data.pop('username')
+        password = validated_data.pop('password')
+        email = validated_data.pop('email', '')
+        phone = validated_data.pop('phone_number', None)
+        user = User.objects.create(username=username, email=email, role='provider', phone_number=phone)
+        user.set_password(password)
+        user.save()
         provider = Provider.objects.create(user=user, **validated_data)
         return provider
     
