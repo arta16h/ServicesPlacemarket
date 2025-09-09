@@ -20,7 +20,7 @@ class Order(models.Model):
     provider = models.ForeignKey(ProviderProfile, on_delete=models.CASCADE, related_name="orders")
     service = models.ForeignKey(ProviderService, on_delete=models.CASCADE, related_name="orders")
     address = models.CharField(max_length=255)
-    datetime = models.DateTimeField()
+    scheduled_time = models.DateTimeField(null=True, blank=True)
     payment_method = models.CharField(max_length=10, choices=PAYMENT_CHOICES)
     status = models.CharField(max_length=10, choices=STATUS, default="pending")
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
