@@ -1,14 +1,20 @@
-from django.urls import path
+# urls.py
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from .views import (
-    ServiceCategoryListView,
-    SubCategoryListView,
-    ProviderServiceListCreateView,
-    SearchServiceView
+    ServiceCategoryViewSet,
+    SubCategoryViewSet,
+    ProviderServiceViewSet,
+    SearchServiceView,
 )
 
+# router برای ویوست‌ها
+router = DefaultRouter()
+router.register(r'service-categories', ServiceCategoryViewSet, basename='service-category')
+router.register(r'subcategories', SubCategoryViewSet, basename='subcategory')
+router.register(r'provider-services', ProviderServiceViewSet, basename='provider-service')
+
 urlpatterns = [
-    path("categories/", ServiceCategoryListView.as_view(), name="categories"),
-    path("subcategories/", SubCategoryListView.as_view(), name="subcategories"),
-    path("my-services/", ProviderServiceListCreateView.as_view(), name="my-services"),
-    path("search/", SearchServiceView.as_view(), name="search-services"),
+    path('search-services/', SearchServiceView.as_view(), name='search-services'),
+    path('', include(router.urls)),
 ]
