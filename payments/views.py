@@ -1,14 +1,16 @@
-from django.shortcuts import render
-from rest_framework import generics
-from .models import Wallet, Transaction
+from rest_framework import generics, status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from .models import Transaction
 from .serializers import WalletSerializer, TransactionSerializer
+from orders.models import Order
 
-
-class WalletDetailView(generics.RetrieveAPIView):
-    queryset = Wallet.objects.all()
+# نمایش کیف پول
+class WalletView(generics.RetrieveAPIView):
     serializer_class = WalletSerializer
+    permission_classes = [IsAuthenticated]
 
+    def get_object(self):
+        return self.request.user.wallet
 
-class TransactionListCreateView(generics.ListCreateAPIView):
-    queryset = Transaction.objects.all()
-    serializer_class = TransactionSerializer
