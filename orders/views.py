@@ -6,7 +6,8 @@ from .models import Order, ProviderAvailability
 from payments.models import Wallet, Transaction
 from .serializers import OrderSerializer, ProviderAvailabilitySerializer
 from services.models import ProviderService
-from utils.comission import get_commission_rate
+from payments.utils import pay_travel_fee, get_commission_rate
+import datetime
 
 # مشتری سفارش ایجاد می‌کند
 class CreateOrderView(generics.CreateAPIView):
@@ -83,19 +84,31 @@ class BookAvailabilityView(generics.UpdateAPIView):
     def perform_update(self, serializer):
         availability = self.get_object()
         if availability.is_booked:
-            raise ValueError("این تایم قبلا رزرو شده است")
+            raise PermissionError("این تایم قبلا رزرو شده است")
+        service_id = self.request.data.get('provider_service')
+        if not service_id:
+            raise PermissionError("provider_service field required")
+        provider_service = get_object_or_404(ProviderService, id=service_id)
 
-        # ثبت سفارش همراه با این تایم
+        if provider_service.provider != availability.provider:
+            raise PermissionError("خدمات انتخاب شده با ارئه دهنده مغایرت دارد")
+        # create order
         order = Order.objects.create(
             customer=self.request.user,
             provider=availability.provider,
-            service=None,  # اینجا باید سرویس انتخابی مشتری بیاد
+            provider_service=provider_service,
+            address=self.request.user.addresses.first(),
+            address_text=(self.request.data.get('address_text') or None),
             scheduled_time=availability.start_time,
-            status="pending"
+            payment_method=self.request.data.get('payment_method', 'wallet'),
+            total_price = provider_service.price + provider_service.travel_fee
         )
-
         availability.is_booked = True
         availability.save()
+
+        if order.payment_method == 'wallet' and provider_service.travel_fee and provider_service.travel_fee > 0:
+            pay_travel_fee(order)
+        serializer.save(is_booked=True)
 
 def complete_order(order):
     customer_wallet = order.customer.wallet
