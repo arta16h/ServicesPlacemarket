@@ -26,7 +26,17 @@ def send_order_status_change(order):
     )
 
 
-
+def send_realtime_notification(user, message):
+    notification = Notification.objects.create(
+        user=user,
+        message=message
+    )
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        f"user_{user.id}",
+        {"type": "send_notification", "message": notification.message}
+    )
+    send_order_status_change()
 
 # ذخیره وضعیت قبلی قبل از تغییر
 @receiver(pre_save, sender=Order)
