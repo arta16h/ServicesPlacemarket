@@ -155,3 +155,8 @@ CHANNEL_LAYERS = {
     },
 }
 
+ZARINPAL_MERCHANT_ID = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"  # مرچنت کد
+ZARINPAL_STARTPAY_URL = "https://www.zarinpal.com/pg/StartPay/"
+ZARINPAL_REQUEST_URL = "https://api.zarinpal.com/pg/v4/payment/request.json"
+ZARINPAL_VERIFY_URL = "https://api.zarinpal.com/pg/v4/payment/verify.json"
+ZARINPAL_CALLBACK_URL = "http://127.0.0.1:8000/api/wallet/callback/"
