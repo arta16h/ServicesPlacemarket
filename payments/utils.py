@@ -14,4 +14,21 @@ def get_commission_rate(provider):
         return Decimal('0.15')
     return Decimal('0.10')
 
+@transaction.atomic
+def pay_travel_fee(order):
+    wallet = Wallet.objects.select_for_update().get(user=order.customer)
+    fee = quantize_amount(order.provider_service.travel_fee or 0)
+    if fee <= 0:
+        order.travel_fee_paid = True
+        order.save()
+        return
+    if wallet.balance < fee:
+        raise ValidationError("موجودی کیف پول کافی نیست")
+    wallet.balance -= fee
+    wallet.save()
+    Transaction.objects.create(user=order.customer, order=order, transaction_type='payment', amount=fee,
+                               description=f"هزینه ایاب و ذهاب {order.id}")
+    order.travel_fee_paid = True
+    order.save()
+
 
