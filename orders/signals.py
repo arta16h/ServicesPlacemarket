@@ -4,6 +4,10 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from .models import Order
 from notifications.models import Notification
+from datetime import timedelta
+from django.utils.timezone import now
+from django_celery_beat.models import PeriodicTask, CrontabSchedule
+import json
 
 
 channel_layer = get_channel_layer()
@@ -95,3 +99,24 @@ def create_order_notification(sender, instance, created, **kwargs):
                     instance.provider.user,
                     f"شما سفارش #{instance.id} را با موفقیت تکمیل کردید 👏"
                 )
+
+
+@receiver(post_save, sender=Order)
+def schedule_order_reminder(sender, instance, created, **kwargs):
+    if instance.status == "COMPLETED":
+        # تنظیم تاریخ یادآوری (۳۰ روز بعد)
+        remind_date = now() + timedelta(days=30)
+
+        schedule, _ = CrontabSchedule.objects.get_or_create(
+            minute=remind_date.minute,
+            hour=remind_date.hour,
+            day_of_month=remind_date.day,
+            month_of_year=remind_date.month,
+        )
+
+        PeriodicTask.objects.create(
+            crontab=schedule,
+            name=f"remind_order_{instance.id}",
+            task="orders.tasks.send_order_reminder",
+            args=json.dumps([instance.customer.id, instance.service.id]),
+        )
