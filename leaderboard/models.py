@@ -19,5 +19,18 @@ class LeaderboardEntry(models.Model):
        return f"{self.provider.username} - Rank {self.rank} - Score {self.score}"
     
 
+class LeaderboardSettings(models.Model):
+    weight_orders = models.FloatField(default=0.7, help_text="وزن تعداد سفارش‌ها (بین 0 و 1)")
+    weight_ratings = models.FloatField(default=0.3, help_text="وزن امتیاز (بین 0 و 1)")
 
+    def clean(self):
+        if (self.weight_orders + self.weight_ratings) != 1:
+            raise ValidationError("جمع وزن‌ها باید برابر با 1 باشد.")
+
+    def __str__(self):
+        return "تنظیمات امتیازدهی لیدربورد"
+
+    class Meta:
+        verbose_name = "تنظیمات لیدربورد"
+        verbose_name_plural = "تنظیمات لیدربورد"
 
