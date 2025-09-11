@@ -121,3 +121,42 @@ class PayOrderView(APIView):
         return Response({"message": "پرداخت موفق", "comission": commission, "provider_amount": provider_amount})
     
 
+class WalletDepositCallbackView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        transaction_id = request.GET.get("transaction_id")
+        authority = request.GET.get("Authority")
+        status = request.GET.get("Status")
+
+        try:
+            transaction = Transaction.objects.get(id=transaction_id, authority=authority, wallet__user=request.user)
+        except Transaction.DoesNotExist:
+            return HttpResponse("تراکنش یافت نشد یا متعلق به شما نیست.")
+
+        if status != "OK":
+            transaction.status = "FAILED"
+            transaction.save()
+            return HttpResponse("پرداخت ناموفق بود")
+
+        req_data = {
+            "merchant_id": settings.ZARINPAL_MERCHANT_ID,
+            "amount": transaction.amount,
+            "authority": authority,
+        }
+        response = requests.post(settings.ZARINPAL_VERIFY_URL, json=req_data).json()
+
+        if "data" in response and response["data"].get("code") == 100:
+            transaction.status = "SUCCESS"
+            transaction.ref_id = response["data"]["ref_id"]
+            transaction.save()
+
+            wallet = transaction.wallet
+            wallet.balance += transaction.amount
+            wallet.save()
+
+            return HttpResponse(f"پرداخت موفق! شناسه پیگیری: {transaction.ref_id}")
+        else:
+            transaction.status = "FAILED"
+            transaction.save()
+            return HttpResponse("پرداخت تایید نشد.")
