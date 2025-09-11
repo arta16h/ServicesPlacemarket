@@ -8,7 +8,7 @@ class Wallet(models.Model):
     balance = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     def __str__(self):
-        return f"اعتبار کیف پول ({self.user.username}): {self.balance}"
+        return f"{self.user.username}: {self.balance}"
     
 
 class Transaction(models.Model):
