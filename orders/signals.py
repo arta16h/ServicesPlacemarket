@@ -132,3 +132,20 @@ def update_provider_stats_on_order(sender, instance, **kwargs):
         stats.completed_orders += 1
         stats.calculate_final_score()
 
+
+@receiver(post_save, sender=Review)
+def update_provider_stats_on_review(sender, instance, created, **kwargs):
+    if not created:
+        return
+
+    stats, _ = ProviderStats.objects.get_or_create(provider=instance.provider)
+
+    # محاسبه میانگین امتیاز از همهٔ ریویوهای آن ارائه‌دهنده
+    agg = Review.objects.filter(provider=instance.provider).aggregate(avg_rating=Avg('rating'))
+    avg_rating = agg.get('avg_rating') or 0.0
+    stats.avg_rating = float(avg_rating)
+    # سپس دوباره محاسبه‌ی امتیاز نهایی (در صورت وجود متد)
+    try:
+        stats.calculate_final_score()
+    except Exception:
+        stats.save()
