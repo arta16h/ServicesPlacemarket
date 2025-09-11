@@ -1,7 +1,31 @@
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 from .models import Order
 from notifications.models import Notification
+
+
+channel_layer = get_channel_layer()
+def send_order_status_change(order):
+    message = f"وضعیت سفارش شما {order.id} تغییر کرد به: {order.status}"
+
+    # ثبت در دیتابیس
+    Notification.objects.create(
+        user=order.customer,
+        message=message
+    )
+
+    # ارسال real-time به کلاینت
+    async_to_sync(channel_layer.group_send)(
+        f"notifications_{order.customer.id}",
+        {
+            "type": "send_notification",
+            "message": message,
+        }
+    )
+
+
 
 
 # ذخیره وضعیت قبلی قبل از تغییر
@@ -20,9 +44,9 @@ def track_old_status(sender, instance, **kwargs):
 def create_order_notification(sender, instance, created, **kwargs):
     if created:
         # سفارش جدید → اطلاع به ارائه‌دهنده
-        Notification.objects.create(
-            user=instance.provider.user,
-            message=f"سفارش جدید #{instance.id} برای شما ثبت شد."
+        send_realtime_notification(
+            instance.provider.user,
+            f"سفارش جدید #{instance.id} برای شما ثبت شد."
         )
     else:
         old_status = getattr(instance, "_old_status", None)
@@ -31,33 +55,33 @@ def create_order_notification(sender, instance, created, **kwargs):
         if old_status != instance.status:
             # نقش‌ها رو مدیریت می‌کنیم
             if instance.status == "accepted":
-                Notification.objects.create(
-                    user=instance.customer,
-                    message=f"سفارش #{instance.id} توسط {instance.provider.user.full_name} تأیید شد ✅"
+                send_realtime_notification(
+                    instance.customer,
+                    f"سفارش #{instance.id} توسط {instance.provider.user.full_name} تأیید شد ✅"
                 )
 
             elif instance.status == "rejected":
-                Notification.objects.create(
-                    user=instance.customer,
-                    message=f"متأسفانه سفارش #{instance.id} توسط {instance.provider.user.full_name} رد شد ❌"
+                send_realtime_notification(
+                    instance.customer,
+                    f"متأسفانه سفارش #{instance.id} توسط {instance.provider.user.full_name} رد شد ❌"
                 )
 
             elif instance.status == "in_progress":
-                Notification.objects.create(
-                    user=instance.customer,
-                    message=f"سفارش #{instance.id} در حال انجام است 🛠️"
+                send_realtime_notification(
+                    instance.customer,
+                    f"سفارش #{instance.id} در حال انجام است 🛠️"
                 )
-                Notification.objects.create(
-                    user=instance.provider.user,
-                    message=f"شما سفارش #{instance.id} را آغاز کردید."
+                send_realtime_notification(
+                    instance.provider.user,
+                    f"شما سفارش #{instance.id} را آغاز کردید."
                 )
 
             elif instance.status == "done":
-                Notification.objects.create(
-                    user=instance.customer,
-                    message=f"سفارش #{instance.id} تکمیل شد 🎉 لطفاً نظر خود را ثبت کنید."
+                send_realtime_notification(
+                    instance.customer,
+                    f"سفارش #{instance.id} تکمیل شد 🎉 لطفاً نظر خود را ثبت کنید."
                 )
-                Notification.objects.create(
-                    user=instance.provider.user,
-                    message=f"شما سفارش #{instance.id} را با موفقیت تکمیل کردید 👏"
+                send_realtime_notification(
+                    instance.provider.user,
+                    f"شما سفارش #{instance.id} را با موفقیت تکمیل کردید 👏"
                 )
