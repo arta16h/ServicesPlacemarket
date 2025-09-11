@@ -1,11 +1,11 @@
 from django.db import models
-from users.models import User, ProviderProfile
+from users.models import User, Provider
 from orders.models import Order
 
 class Review(models.Model):
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name="review")
     customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reviews")
-    provider = models.ForeignKey(ProviderProfile, on_delete=models.CASCADE, related_name="reviews")
+    provider = models.ForeignKey(Provider, on_delete=models.CASCADE, related_name="reviews")
     rating = models.PositiveIntegerField(default=5)
     comment = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
