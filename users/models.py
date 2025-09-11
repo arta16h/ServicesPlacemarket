@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from django.db import models
+from leaderboard.models import LeaderboardSettings
 
 
 class User(AbstractUser):
@@ -47,3 +48,18 @@ class Address(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.label or self.full_address[:30]}"
+    
+
+class ProviderStats(models.Model):
+    provider = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="stats")
+    completed_orders = models.PositiveIntegerField(default=0)
+    avg_rating = models.FloatField(default=0)
+    final_score = models.FloatField(default=0) #امتیاز ترکیبی
+
+    def calculate_final_score(self):
+        settings_obj = LeaderboardSettings.objects.first()
+        weight_orders = settings_obj.weight_orders if settings_obj else 0.7
+        weight_ratings = settings_obj.weight_ratings if settings_obj else 0.3
+
+        self.final_score = (self.completed_orders * weight_orders) + (self.avg_rating * 20 * weight_ratings)
+        self.save()
