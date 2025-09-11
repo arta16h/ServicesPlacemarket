@@ -1,8 +1,11 @@
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
+from django.db.models import Avg
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+from users.models import ProviderStats
 from .models import Order
+from reviews.models import Review
 from notifications.models import Notification
 from datetime import timedelta
 from django.utils.timezone import now
@@ -120,3 +123,12 @@ def schedule_order_reminder(sender, instance, created, **kwargs):
             task="orders.tasks.send_order_reminder",
             args=json.dumps([instance.customer.id, instance.service.id]),
         )
+
+
+@receiver(post_save, sender=Order)
+def update_provider_stats_on_order(sender, instance, **kwargs):
+    if instance.status == "COMPLETED":
+        stats, _ = ProviderStats.objects.get_or_create(provider=instance.provider)
+        stats.completed_orders += 1
+        stats.calculate_final_score()
+
