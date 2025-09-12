@@ -2,6 +2,9 @@ from celery import shared_task
 from django.contrib.auth import get_user_model
 from services.models import Service
 from notifications.models import Notification
+import logging
+logger = logging.getLogger(__name__)
+
 
 User = get_user_model()
 

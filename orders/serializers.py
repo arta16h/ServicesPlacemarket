@@ -2,6 +2,8 @@ from rest_framework import serializers
 from .models import Order, ProviderAvailability
 from services.serializers import ProviderServiceSerializer
 from users.serializers import AddressSerializer
+import logging
+logger = logging.getLogger(__name__)
 
 
 class OrderSerializer(serializers.ModelSerializer):

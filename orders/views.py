@@ -8,6 +8,8 @@ from .serializers import OrderSerializer, ProviderAvailabilitySerializer
 from services.models import ProviderService
 from payments.utils import pay_travel_fee, get_commission_rate
 import datetime
+import logging
+logger = logging.getLogger(__name__)
 
 # مشتری سفارش ایجاد می‌کند
 class CreateOrderView(generics.CreateAPIView):

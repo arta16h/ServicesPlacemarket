@@ -3,6 +3,9 @@ from .views import (
     CreateOrderView, CustomerOrdersView, ProviderOrdersView,
     UpdateOrderStatusView, ProviderAvailabilityView, BookAvailabilityView, ProviderAvailabilityListView, 
 )
+import logging
+logger = logging.getLogger(__name__)
+
 
 urlpatterns = [
     path("create/", CreateOrderView.as_view(), name="create-order"),

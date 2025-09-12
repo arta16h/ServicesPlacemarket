@@ -11,6 +11,8 @@ from datetime import timedelta
 from django.utils.timezone import now
 from django_celery_beat.models import PeriodicTask, CrontabSchedule
 import json
+import logging
+logger = logging.getLogger(__name__)
 
 
 channel_layer = get_channel_layer()

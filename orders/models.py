@@ -2,7 +2,8 @@ from django.db import models
 from django.conf import settings
 from services.models import ProviderService
 from users.models import User, Provider
-
+import logging
+logger = logging.getLogger(__name__)
 
 
 class Order(models.Model):
