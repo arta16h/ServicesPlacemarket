@@ -9,6 +9,9 @@ from .models import Transaction
 from .utils import get_commission_rate
 from .serializers import WalletSerializer, TransactionSerializer
 from orders.models import Order
+import logging
+logger = logging.getLogger(__name__)
+
 
 # نمایش کیف پول
 class WalletView(generics.RetrieveAPIView):

@@ -2,6 +2,8 @@ from django.db import models
 from users.models import User
 from orders.models import Order
 from django.conf import settings
+import logging
+logger = logging.getLogger(__name__)
 
 
 class Wallet(models.Model):

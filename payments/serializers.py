@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import Wallet, Transaction
+import logging
+logger = logging.getLogger(__name__)
 
 
 class WalletSerializer(serializers.ModelSerializer):

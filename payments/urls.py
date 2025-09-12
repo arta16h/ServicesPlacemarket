@@ -1,6 +1,9 @@
 from django.urls import path
 from .views import (WalletView, DepositWalletView, WithdrawWalletView, 
         PayOrderView, TransactionListView, WalletDepositRequestView, WalletDepositCallbackView)
+import logging
+logger = logging.getLogger(__name__)
+
 
 urlpatterns = [
     path("wallet/", WalletView.as_view(), name="wallet"),
