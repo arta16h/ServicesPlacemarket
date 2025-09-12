@@ -13,6 +13,9 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
 from django.core.asgi import get_asgi_application
 import notifications.routing
+import logging
+logger = logging.getLogger(__name__)
+
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'service_marketplace.settings')
 django.setup()
