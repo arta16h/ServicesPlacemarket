@@ -2,6 +2,8 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import User, Provider, Address
 from .utils import get_address_from_coords
+import logging
+logger = logging.getLogger(__name__)
 
 
 User = get_user_model()

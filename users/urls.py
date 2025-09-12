@@ -1,5 +1,7 @@
 from django.urls import path
 from .views import *
+import logging
+logger = logging.getLogger(__name__)
 
 
 urlpatterns = [

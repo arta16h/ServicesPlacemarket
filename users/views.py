@@ -6,6 +6,8 @@ from .models import User, Provider, Address
 from .serializers import UserRegisterSerializer, ProviderRegisterSerializer, AddressSerializer
 from rest_framework.decorators import api_view
 from reviews.models import Review
+import logging
+logger = logging.getLogger(__name__)
 
 
 class RegisterUserView(generics.CreateAPIView):

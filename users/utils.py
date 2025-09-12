@@ -1,5 +1,8 @@
 import requests
 from django.conf import settings
+import logging
+logger = logging.getLogger(__name__)
+
 
 def get_address_from_coords(lat, lng):
     api_key = settings.GOOGLE_MAPS_API_KEY
