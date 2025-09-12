@@ -2,6 +2,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from users.models import ProviderStats
 from .models import LeaderboardSettings
+import logging
+logger = logging.getLogger(__name__)
 
 @receiver(post_save, sender=LeaderboardSettings)
 def recalculate_scores(sender, instance, **kwargs):

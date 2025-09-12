@@ -2,6 +2,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import LeaderboardEntry
 from django.utils.timezone import now
+import logging
+logger = logging.getLogger(__name__)
+
 
 class LeaderboardView(APIView):
     def get(self, request):

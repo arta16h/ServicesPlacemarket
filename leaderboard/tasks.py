@@ -2,6 +2,8 @@ from celery import shared_task
 from django.utils.timezone import now
 from users.models import ProviderStats
 from leaderboard.models import LeaderboardEntry
+import logging
+logger = logging.getLogger(__name__)
 
 
 @shared_task

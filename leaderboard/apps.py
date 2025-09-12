@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+import logging
 
 
 class LeaderboardConfig(AppConfig):
@@ -7,3 +8,5 @@ class LeaderboardConfig(AppConfig):
 
     def ready(self):
         import leaderboard.signals
+
+logger = logging.getLogger(__name__)

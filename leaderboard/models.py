@@ -1,7 +1,8 @@
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
-
+import logging
+logger = logging.getLogger(__name__)
 
 class LeaderboardEntry(models.Model):
     provider = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
