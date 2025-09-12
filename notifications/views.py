@@ -2,6 +2,8 @@ from rest_framework import generics, permissions
 from rest_framework.permissions import IsAuthenticated
 from .models import Notification
 from .serializers import NotificationSerializer
+import logging
+logger = logging.getLogger(__name__)
 
 
 class NotificationListView(generics.ListAPIView):

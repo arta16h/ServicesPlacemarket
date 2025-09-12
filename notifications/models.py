@@ -1,5 +1,7 @@
 from django.db import models
 from users.models import User
+import logging
+logger = logging.getLogger(__name__)
 
 
 class Notification(models.Model):
