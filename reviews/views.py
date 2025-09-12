@@ -6,6 +6,8 @@ from .serializers import ReviewSerializer
 from users.models import ProviderProfile
 from orders.models import Order
 from django.db.models import Avg, Count
+import logging
+logger = logging.getLogger(__name__)
 
 # ثبت نظر و امتیاز
 class CreateReviewView(generics.CreateAPIView):

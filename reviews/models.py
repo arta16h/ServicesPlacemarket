@@ -1,6 +1,8 @@
 from django.db import models
 from users.models import User, Provider
 from orders.models import Order
+import logging
+logger = logging.getLogger(__name__)
 
 class Review(models.Model):
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name="review")

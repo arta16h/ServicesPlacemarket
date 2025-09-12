@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import Review
+import logging
+logger = logging.getLogger(__name__)
 
 
 class ReviewSerializer(serializers.ModelSerializer):
