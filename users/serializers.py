@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import User, Provider, Address
-from services.serializers import ProviderServiceSerializer
+from .utils import get_address_from_coords
 
 
 User = get_user_model()
@@ -48,3 +48,17 @@ class AddressSerializer(serializers.ModelSerializer):
         model = Address
         fields = ['id', 'label', 'full_address', 'place_id', 'latitude', 'longitude', 'created_at']
         read_only_fields = ['created_at']
+
+    def create(self, validated_data):
+        lat = validated_data.get("latitude")
+        lng = validated_data.get("longitude")
+        if lat and lng:
+            validated_data["address"] = get_address_from_coords(lat, lng)
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        lat = validated_data.get("latitude")
+        lng = validated_data.get("longitude")
+        if lat and lng:
+            validated_data["address"] = get_address_from_coords(lat, lng)
+        return super().update(instance, validated_data)
