@@ -1,5 +1,8 @@
 from rest_framework import serializers
 from .models import ServiceCategory, SubCategory, ProviderService
+import logging
+logger = logging.getLogger(__name__)
+
 
 class ServiceCategorySerializer(serializers.ModelSerializer):
     class Meta:

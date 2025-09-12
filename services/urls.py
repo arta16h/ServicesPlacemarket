@@ -7,6 +7,9 @@ from .views import (
     ProviderServiceViewSet,
     SearchServiceView,
 )
+import logging
+logger = logging.getLogger(__name__)
+
 
 # router برای ویوست‌ها
 router = DefaultRouter()

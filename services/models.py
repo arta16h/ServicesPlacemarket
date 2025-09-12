@@ -1,5 +1,7 @@
 from django.db import models
 from users.models import Provider
+import logging
+logger = logging.getLogger(__name__)
 
 
 class ServiceCategory(models.Model):

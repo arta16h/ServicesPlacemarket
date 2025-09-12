@@ -1,6 +1,8 @@
 from rest_framework import generics, filters, permissions, viewsets
 from .models import ServiceCategory, SubCategory, ProviderService
 from .serializers import ServiceCategorySerializer, SubCategorySerializer, ProviderServiceSerializer
+import logging
+logger = logging.getLogger(__name__)
 
 
 class ServiceCategoryViewSet(viewsets.ModelViewSet):
