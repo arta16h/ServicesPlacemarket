@@ -18,4 +18,4 @@ def send_order_reminder(user_id, service_id):
             message=f"می‌خواید دوباره سرویس {service.name} رو برای این ماه رزرو کنید؟"
         )
     except Exception as e:
-        print(f"Reminder error: {e}")
+        logger.exception(f"Reminder error: {e}")
