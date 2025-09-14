@@ -3,7 +3,7 @@ from django.apps import apps
 
 # Dynamically register all models in this app with a helpful ModelAdmin.
 # The admin tries to pick reasonable defaults for list_display, list_filter, search_fields and readonly_fields.
-app_config = apps.get_containing_app_config(__file__)
+app_config = apps.get_containing_app_config('users')
 models = app_config.get_models()
 
 for model in models:
